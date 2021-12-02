@@ -1,0 +1,189 @@
+
+cat /etc/os-release
+/*to check the os version
+
+
+sudo apt-get update
+/*This command refreshes your local list of software, making a note of any newer revisions and updates. If there’s a newer version of the kernel, the command will find it and mark it for download and installation.
+
+
+sudo apt-get install <package name>
+/*to install a package
+eg: sudo apt-get install git
+
+/*to remove a package
+sudo apt-get remove jenkins
+sudo apt remove default-jdk default-jre
+
+sudo apt-get install default-jdk
+/*to install java default version.
+sudo apt-get install default-jdk -y
+/*here -y will by default acknowledge as yes for the confirmation message
+
+sudo apt-get install maven
+
+Note:: if we use sudo apt-get install cmmnd to install a package then that will get installed in etc/default directory.
+
+/*Enviromental variable::
+java path default::
+/usr/lib/jvm/java-11-openjdk-amd64/bin
+
+sudo wget <url>
+/*to download anything from web
+eg: sudo wget https://git-scm.com/download/win
+
+
+sudo cp <filename> <destination path>
+/*to copy a file
+
+sudo mv <filename> <destination path>
+/*to cut a file
+
+
+sudo mv <filename> <modified file name>
+/*to rename a file
+
+sudo rm <filename> 
+/*to re-move a file
+
+sudo rm -d <directory name> 
+/* to delete a directory
+
+
+find -name <file name>
+/*to search a file in ubuntu
+
+/////////////////////Users creation in Linux server
+
+cat /etc/passwd
+/*to see the list of users present on server
+
+user creation:
+sudo adduser <username>
+
+/*even though we created a new user, he cant do anything w/o giving permissions.
+sudo visudo
+/* file will open nano editor, there we will add created user in (User privilege specification) still he needs to use sudo before every command but if we add the same user in  (Allow members of group sudo to execute any command) then he can implement all commands as root user w/o using sudo.
+
+# User privilege specification
+source username    ALL=(ALL:ALL) ALL
+
+
+
+///////////////////Login to server by using created user
+
+/*open a file in below path and change the passwd authentication to 'yes'  to login to the server through new user using password. 
+sudo vi /etc/ssh/sshd_config
+/*later restart ssh directory by using below cmmnd
+sudo service ssh restart
+
+
+//////////////////////
+login from one server to another server
+ssh <username in other server>@ip
+/*to jump from one server to another server
+
+sudo vi /etc/hostname
+/*to change the host name
+
+sudo reboot
+/* to reboot the server after changing the hostname.
+
+///// to rename user name
+sudo usermod -l newusername -d /home/newusername -m oldusername
+
+
+//////////////////////to copy/file or directory from one server to another server
+
+sudo scp -r <Sourcefilepath> user@IP:<destinationpath>
+
+sudo chmod 777 <dirctory name>
+/*to give the full permissions to a directory
+
+
+//////////////to change the ownership of a directory
+
+sudo chown -R owner:group DirectoryName/
+
+
+
+/////////////maven
+
+mvn archetype:generate
+
+mvn archetype:generate>folderstructure.output
+
+
+
+/////////////Tomcat ////////////
+installation::
+
+sudo wget <Url> 
+
+port number path::
+/opt/project_services/tomcat9/conf/server.xml
+
+Tomcat 403 error::
+
+/opt/project_services/tomcat_9/webapps/manager/META-INF# vi context.xml
+
+<!--
+  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />s
+-->	
+
+
+root@ip-172-31-7-66:/opt/projectservices/tomcat_9/conf# vi tomcat-users.xml
+
+
+<role rolename="manager-gui"/>
+<user username="tomcat" password="admin" roles="manager-gui"/>
+
+
+
+
+ps aux | grep <search item>
+/* to check the background process
+
+kill <search item id>
+/*to kill the background process
+
+
+
+########Issue::###########3
+when i was created a new user(eg:dockeradmin) then i switch to the created user then i saw only '$' instead of 'dockeradmin@ip-172-31-80-91:/$'
+
+solution:
+usually this kind of error will occur whenever you have created an user using useradd command insted of adduser.
+useradd is a low level utility for adding users. On Debian, administrators should usually use adduser(8) instead.
+
+anyway I found the solution here
+
+/*first at root i did a
+echo $SHELL
+/*I saw that I have /bin/bash
+/*then i switch to dockeradmin
+sudo su dockeradmin
+/*then i do a
+echo $SHELL
+/*I saw that I had
+/bin/sh
+/*instead.So I did a
+chsh -s /bin/bash
+/*I was prompted for my dockeradmin password so I gave it after that I switch back to root
+exit
+/*then i log back into dockeradmin
+
+sudo su dockeradmin
+/*I checked the $SHELL again
+echo $SHELL
+I saw that now it is
+/bin/bash
+
+
+
+
+
+
+which <command>
+/*to know the location of our command. 

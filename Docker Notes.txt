@@ -1,0 +1,268 @@
+Virtualization drawbacks:
+
+* performance issues due to multiple applications running at once
+* Applications running slow
+* cost effective
+* approx 10% memory wasted for Disk usage (or) vitualization packages
+* It will take much time time to start/stop server.
+* Other applications will effect if we work on one application
+
+///////////////////////DOCKER//////////////////////////////
+Docker is a platform which packages an application and all its dependencies together in the form of containers. This containerization aspect ensures that the application works in any environment.
+
+https://docs.docker.com/get-started/overview/
+
+######################################Docker architecture#############################
+The Docker client talks to the Docker daemon, which does the heavy lifting of building, running, and distributing your Docker containers. 
+The Docker client and daemon can run on the same system, or you can connect a Docker client to a remote Docker daemon. 
+The Docker client and daemon communicate using a REST API, over UNIX sockets or a network interface. 
+Another Docker client is Docker Compose, that lets you work with applications consisting of a set of containers.
+
+Docker Engine is an application that is installed in your local machine.
+Docker uses a client-server architecture and client-server architecture communicates using a REST API.
+Docker daemon checks the requests from client to manage the containers.
+
+Components in docker architecture:
+>>client
+>>Docker Host
+>>Registry
+>>Docker daemon
+>>Images
+>>Containers
+
+Docker client which is used to trigger docker commands such as docker pull, docker run, Docker build etc.
+Docker Host which runs the docker daemons and a docker registry (which stores docker images).
+Docker daemon running with the docker host is responsible for images and containers.
+
+To build a Docker image you can use CLI or the client to issue a build to command the docker daemon which runs on the docker host.
+Now the docker daemon will build an image based on your inputs and save it in the registry which can either be a docker hub or a local repository.
+and to create any running instance from an image(that is a container) we can issue a run command from the CLI or the client which will create a docker container.
+so this is overall architecture or functioning of the docker architecture.
+ 
+########The Docker daemon
+The Docker daemon (dockerd) listens for Docker API requests and manages Docker objects such as images, containers, networks, and volumes. 
+A daemon can also communicate with other daemons to manage Docker services.
+
+
+/////// Installation
+
+sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo snap remove docker
+sudo snap remove --purge docker
+/* to remove previous versions of docker.
+
+
+https://get.docker.com/
+#   $ curl -fsSL https://get.docker.com -o get-docker.sh
+#   $ sh get-docker.sh
+
+
+docker -v
+/*docker version 20.10
+
+
+below is the docker hub to download images
+https://hub.docker.com/
+
+
+
+
+docker images
+/* to check the downloaded images.
+
+docker run -it <image id>
+/*to create and login to the container(it - interactive terminal)
+
+
+docker ps -a
+/* to check running + stopped containers
+
+docker start <container id>
+/* to start a container
+
+docker restart <container id>
+
+
+exit
+/* to stop and exit from container.
+
+ctrl + pq
+/* to exit from container w/o stopping
+
+docker attach <container id>
+
+/* to login to running container
+
+docker run -itd <image id>
+/*it will create and start a new container but it wont login to the container(d- dettached)
+
+docker rename <old container namer>  <new container name>
+/* to rename containers
+
+docker run --name <newcontainer name> -itd <image id>
+/* to create a container along with desired name 
+
+
+
+docker rm <container id/container  name>
+/* we can remove running container forcely but we shudnt do that, we shud stop and remove the container
+
+docker rmi <image id>
+/*to remove images
+
+
+
+///////////////////Docker file////////////////////////
+
+Docker file ----> Docker image ----> Docker container ---> Docker Registry
+
+NOte:: If we create a docker file having few packages and all dependecies then if we create an image from that docker file and later if we create N number of containers from that image  then all containers comes up with all package on that docker file.
+
+
+###error###Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Post 
+
+sudo chmod 666 /var/run/docker.sock
+sudo usermod -aG docker ${ubuntu}
+/* to resolve user permission issues while executing docker commands
+
+///Docker file creation
+
+sudo vi Dockerfile
+
+FROM ubuntu:18.04
+MAINTAINER Anand<jvanand.kothur@gmail.com>	
+
+
+docker build -t <image name> .
+/* to build an image from docker file (-t means tag) (. means path)
+
+FROM ubuntu:18.04
+MAINTAINER Anand<jvanand.kothur@gmail.com>
+run apt-get update
+run apt-get install default-jdk -y
+run apt-get install wget -y
+run cd /opt/ && wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.53/bin/apache-tomcat-9.0.53.tar.gz
+run cd /opt/ && tar -xvf apache-tomcat-9.0.53.tar.gz
+WORKDIR opt
+EXPOSE 8080
+COPY file1.txt /opt/
+ADD https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.53/bin/apache-tomcat-9.0.53-fulldocs.tar.gz /opt/
+
+
+Note:: Usually containers will come only with the os thats why those are light weight, if we want any packages like wget, nano, vi editors etc we need to install them manually. 
+Note:WORKDIR -->by default container open with opt directory
+Note:EXPOSE -->to assign a port number to images
+Note: COPY --> to copy file from host server to container
+Note: Add --> to download a file form external server (ADD is like wget)
+
+
+docker ps -aq
+/* to get only container ids
+
+docker images -q
+/* to get only image ids
+
+
+docker start $(docker ps -aq)
+/* to start all containers at once
+docker start $(docker ps -aq)
+
+docker rmi $(docker images -q)
+/*to remove all images at once
+
+//////////////Docker hub////////
+docker login
+/*need to give the docker hub creds before committing any changes
+
+docker logout
+/*to log out from docker hub
+
+Note: In a server(test/production) if any new changes made to a docker flle then before building a new image we need to take the back up of an old image (i.e we need to push the old image to docker hub)
+
+docker commit <container id> <backup name>
+/*to take the backup of a container
+/* backup name should be like git hub repository 
+
+docker tag server:latest myname/server:latest
+/*to change the repository
+
+
+//////////////////////////port mapping////////////////////
+
+docker run -itd --name <container name> -p <ports> <image id>
+/* to create a new container with port
+
+
+
+//////////////////////////////////Port reassign for existing  containers///////
+step1: stop the container
+docker stop <container name>
+
+step2: contruct a new image using old container
+docker commit <existing container name> <new image name>
+
+step3: re-run from the commited image
+docker run -p 8080:8080 -td <new container name>
+////////////////////////////////////////////////
+
+docker tag <oldname> <new name>
+/*to rename the docker images
+
+
+Note:: Docker can be configured to bind each container to separate server ports. For eg. bind Docker 1’s port 80 to servers port 8080, Docker 2’s to 8081, etc.
+
+
+
+//////////Docker swarm///////////////////////////
+Docker swarm is a container orchestration tool, meaning that it allows the user to manage multiple containers deployed across multiple host machines. 
+One of the key benefits associated with the operation of a docker swarm is the high level of availability offered for applications.
+
+Developer usually push docker file in git hub along with src, pom.xml files.
+
+we will call container as service in Docker swarm.
+
+///////////////////Docker swarm cluster set up/////////////////
+
+Install docker on all servers first
+
+docker node ls
+/* to check the list of node under master
+
+docker swarm init
+/*to generate the token for adding nodes under master later we need to run the generated token in all nodes in that cluster
+
+docker swarm join-token worker
+/*to see the token again
+
+/* You need to ensure that the requisite network ports are open between the swarm nodes.
+
+TCP port 2377 for cluster management communications
+TCP and UDP port 7946 for communication among nodes
+UDP port 4789 for overlay network traffic
+
+docker network ls
+/* when we initiate docker swarm communication will happens among cluster nodes through ingress overlay network.
+
+docker service create --replicas <number of containers required>  -p <port map> --name=<service name> <image name>
+/* to create docker swarm services in master node
+
+docker service ls
+/* to check the services
+
+docker service ps <service name>
+/* to know the detailed service info
+
+docker service scale <service name>=<value>
+/* to scale up number of containers
+
+docker service update --image <updated image name> <service name that need to be upgraded>
+/* to upgrade the service
+
+docker service rm <servie name>
+/* to remove the service
+
+docker swarm leave
+/* to leave the node from cluster
+
+Note ::
+Master node size should always greater than slaves

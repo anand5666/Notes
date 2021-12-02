@@ -1,0 +1,250 @@
+Ansible is an open source IT Configuration Management, Deployment & Orchestration tool. It aims to provide large productivity gains to a wide variety of automation challenges.
+This tool is very simple to use yet powerful enough to automate complex multi-tier IT application environments.
+
+
+configuration management tools follow 2 different architectures to achieve their objectives those are:
+>pull based
+>push based
+
+In a pull based architecture you have a master server which stores all the configuration information and then you need to install agents
+on each of the server for which you want to manage the configuration in this architecture the agent will regularly pull the master server to 
+check if there are any changes.
+Tools like puppet and chef use pull based architecture
+
+Now compared to pull based in a push based architecture a central Server pushes the configuration changes on to the target systems ansible is pushed based.
+
+In a pull based system clients contact the server independently of each other therefore the system as a whole is more scalable than a push
+system however the downside is that you need to install and manage an agent on each of the target systems.
+
+now in a push based system it is very easy to do the initial configuration as you do not need to manage or install an agent however once you start scaling your
+infrastructure things start to get complicated and you start seeing performance issues  unless you do stuff like hyper threading etc.
+
+
+- Ansible comes with master clients architecture
+- Ansible agentless that means no need to install any other packages for establishing connections between master and clients. It happened through passwd less authentication.
+- ansible is based on python, if we install ansible then python will authpmatically install.
+
+
+
+//////////////////Installation
+
+/* https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-ansible-on-ubuntu-18-04
+
+
+sudo apt-add-repository ppa:ansible/ansible -y
+
+sudo apt-get update && sudo apt-get install ansible -y
+
+ansible --version
+/*ansible 2.9.26 latest version
+
+/////////Creating passwd less authentication for asible servers to host servers
+
+/* create an user in ansible server and also on all host servers later convert those users as super users through sudo visudo
+
+sudo adduser ansadmin
+sudo visudo
+ansadmin ALL=(ALL) NOPASSWD: ALL
+
+sudo vi /etc/ssh/sshd_config
+/*change the passwd authentication to 'yes' 
+sudo service ssh restart
+
+/*Now switch to ansadmin and generate a public key using ssh-keygen and copy that key to host servers using ssh-copy-id
+
+ssh-keygen
+
+ifconfig -a 
+/*to check the private ip address
+
+ssh-copy-id <destination user>@<private ip address>
+/* to copy ssh keys to client servers
+
+/*Now add all hosts ip addresses in below path unders specified groups
+ 
+vi /etc/ansible/hosts
+/* add all clients/hosts here
+[Hosts Group name]
+<ip address> ansible_user=<host username>
+
+ssh <username>@< ip address>
+/* now you can login to host ip w/o asking passwd
+
+
+
+now add all your client servers in ansible hosts
+sudo vi /etc/ansible/hosts
+
+[clients]
+54.90.173.215 ansible_user=test
+54.82.88.146 ansible_user=test
+
+ansible <hosts group name> -m ping -u <username>      ----> through this command we can check pings through specified user. 
+/* to check the pings from the clients
+
+//////////
+cat /etc/ansible/ansible.cfg
+/*Forks determines how many managed nodes (e.g. the target systems) a task will be run against simultaneously by deafault is set to 5
+example:
+ansible-playbook example.yml --forks 10
+/*here forks is set to 10, so that each task in the playbook is executed against 10 managed nodes simultaneously.
+
+//////////////////AD hoc commands
+
+ansible all -a 'any command'
+/* we can execute any command in host servers
+
+ansible <Hosts Group name> -m copy -a 'src=/path/<file> dest=<path>' -b
+/* to copy a file/dir to host servers (here -b will execute as a super user)
+
+ansible all -m apt -a "upgrade=yes update_cache=yes" -b
+/* to update the server
+
+ansible client -m apt -a "name=maven state=present" -b
+/*to install packages
+
+
+ansible client -m apt -a "name=maven state=absent" -b
+/*to uninstall packages
+
+ansible all -m shell -a "cat /etc/passwd" -b
+/* to execute commands over servers
+
+eg: ansible all -m shell -a "apt-get install default-jdk -y" --become
+
+
+///Play books
+
+#Hosts And Users:
+For each play in a playbook, you get to choose which machines in your infrastructure to target and which remote user to complete the tasks. 
+To include hosts in Ansible inventory, we will be using the IP addresses of the host machines.
+
+#Variables:
+Ansible uses variables which are defined previously to enable more flexibility in playbooks and roles. 
+They can be used to loop through a set of given values, access various information like the host name of a system and replace certain strings in templates with specific values.
+Ansible already defines a rich set of variables, individual for each system. 
+Whenever Ansible will run on a system, all facts and information about the system are gathered and set as variables.
+But there is a rule for naming variables. Variable names should be letters, numbers, and underscores. Variables should always start with a letter. E.g. wamp_21, port5 is valid variable names, whereas 01_port, _server are invalid.
+
+Tasks:
+Tasks allow you to break up bits of configuration policy into smaller files. 
+Task includes pull from other files. Tasks in Ansible go with pretty much the English meaning of it.
+E.g: Install <package_name>, update <software_name> etc.
+
+Handlers:
+Handlers are just like regular tasks in an Ansible playbook, but are only run if the Task contains a notify directive and also indicates that it changed something. 
+For example, if a config file is changed, then the task referencing the config file may notify a service restart handler.
+
+Let me give you an example of a playbook which will start the Apache httpd server program:
+
+---
+- hosts: webservers
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: root
+  tasks:
+  - name: ensure apache is at the latest version
+    yum: name=httpd state=latest
+  - name: write the apache config file
+    template: src=/srv/httpd.j2 dest=/etc/httpd.conf
+    notify:
+    - restart apache
+  - name: ensure apache is running (and enable it at boot)
+    service: name=httpd state=started enabled=yes
+  handlers:
+    - name: restart apache
+      service: name=httpd state=restarted
+
+
+ansible-playbook <playbokname>.yml --syntax-check
+/*to check the playbook syntax 
+
+ansible-playbook <playbook name>.yml
+/*to run the play book
+
+
+
+
+
+
+to create multiple directories
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Create multiple directories
+      file: path={{item}} state=directory
+      with_items:
+      - '/home/vn1'
+      - '/home/vn2'
+      - '/home/vn3'
+
+
+
+
+https://www.edureka.co/blog/ansible-roles-setup-mean-stack
+###########Ansible Roles
+Ansible Role is basically another level of abstraction used to organize playbooks.
+They provide a skeleton for an independent and reusable collection of variables, tasks, templates, files, and modules which can be automatically loaded into the playbook. 
+Playbooks are a collection of roles. Every role has specific functionality. 
+
+Let me explain this with an example. Suppose you want your playbook to perform 10 different tasks on 5 different systems, 
+would you use a single playbook for this? No, using a single playbook can make it confusing and prone to blunders. 
+Instead, you can create 10 different roles, where each role will perform one task. 
+Then, all you need to do is, mention the name of the role inside the playbook to call them. 
+
+- Ansible Roles are independent of each other. Execution of one role doesn’t depend on others and hence they can be reused. 
+
+
+https://gitlab.com/LabIT/ansible
+
+<!DOCTYPE html>
+<html>
+	<body>
+		<h1> Welcome to LabIT Training </h1>
+	</body>
+</html>
+
+---
+#This playbook will install LAMP stack (Apache, mysql, php) on the remote machine
+# written by LabIT training for training purposes
+ - hosts: dev                                        
+   become: yes
+   tasks:
+    - name: install lamp stack
+      
+      apt:
+       pkg:
+        - apache2
+        - mysql-server
+        - php
+        - php-mysql
+       state: latest
+
+      notify: 
+       - start apache
+       - start mysql-server
+      # - create target directory
+       - deploy index.html
+
+   handlers:
+    - name: start apache
+      service:
+       name: apache2
+       state: started
+       enabled: yes
+     
+    - name: start mysql-server
+      service: 
+       name: mysql
+       state: started
+       enabled: yes
+    
+   # - name: create target directory
+   #   file: path=/var/www/html state=directory mode=0755
+
+    - name: deploy index.html
+      copy:
+       src: ~/Documents/ansible/index.html
+       dest: /var/www/html/index.html

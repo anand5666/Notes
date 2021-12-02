@@ -1,0 +1,542 @@
+
+kubernetes is an open source container orchestration framework which was originally developed by google.
+
+https://www.fosstechnix.com/setup-kubernetes-on-aws-using-kops/
+
+Kops (Kubernetes Operations) used to you create, destroy, upgrade and maintain production-grade, highly available, Kubernetes clusters using command line.
+
+Kubernetes KOPS Features::
+Automatic creation of Kubernetes clusters in AWS and GCE(Google Cloud Engine).
+We can create multi master with HA(High availability).
+Automatic creation of VPC, Security Groups, etc., while creating Cluster
+Support Public and Private DNS.
+Runs in Auto scaling.
+We can Add and Edit the Cluster configuration such as Master and worker nodes.
+
+
+We can create kubernetes cluster by using Kops method or Kube ADM Method or minikube.
+Kubernetes is free and open source but we use paid services like Kops method, Kube ADM Method
+Kube ADM method: In this method we are supposed to launch the N number of servers from AWS those were required for the formation of cluster.
+But in Kops method we can launch them at once.
+
+
+
+Components of  Kubernetes::
+https://www.youtube.com/watch?v=Krpb44XR0bk&list=PLy7NrYWoggjziYQIDorlXjTvvwweTYoNC&index=2
+pod::
+
+pod is usually meant to run one application container inside of it you can run multiple containers inside one pod
+but usually it's only the case if you have one main application container and a helper container or some side service that 
+has to run inside of that pod and you say this is nothing special you just have one server and two containers running on it with a
+abstraction layer on top of it 
+so now let's see how they communicate with each other in kubernetes world
+so kubernetes offers out-of-the-box a virtual network which means that each pod gets its own IP address not the container the pod
+gets the IP address and each pod can communicate with each other using that IP address which is an internal IP address 
+obviously it's not the public one.
+
+so my application container can communicate with database container using the IP address however pod components in kubernetes 
+also an important concept are ephemeral which means that they can die very easily and when that happens 
+for example if I lose a database container because the container crashed or the application crashed inside or because the 
+nodes or the server that I'm running them or ran out resources then the pod will die and a new one will get created in its place and when
+that happens it will get assigned a new IP address which obviously is inconvenient if you are communicating with the database using the IP address
+because now you have to adjust it every time pod restarts and because of that another component of kubernetes called service is used.
+
+service::
+so service is basically a static IP address or permanent IP address that can be attached so to say to each POD. 
+so now assume my app will have its own service and database POD will have its own service 
+the good thing here is that the life cycles of service and the pod are not connected so even if the pod dies the service and its IP address will stay 
+so you don't have to change that endpoints anymore
+so now obviously you would want your application to be accessible through a browser right 
+and for this you would have to create an external service so external service is a service that opens the communication from external
+sources but obviously you wouldn't want your database to be open to the public requests and for that you would create something called an internal service 
+so this is a type of a service that you specify when creating one
+however if you notice the URL of the external service is not very practical so basically what you have is an HTTP protocol with a node
+IP address.
+so of the node not the service and the port number of the service(eg: http://124.89.101.2:8080) which is good for test purposes 
+if you want to test something very fast but not for the end product.
+so usually you will want your URL to look like this (https://myapp.com) if you want to talk to your application with a secure protocol and a domain name 
+and for that there is another component of kubernetes called ingress.
+
+Ingress::
+so instead of service the request goes first to ingress and it does the forwarding then to the service.
+
+config map::
+It usually contain configuration data like URLs of database or some other services that use and in kubernetes you just connect it to the
+POD so that POD actually gets the data that config map contains.
+Secret::
+just like config map you just connect it to your POD so that pod can actually see the data and read from the secret 
+you can actually use the data from config map or secret inside of your application pod using for example
+environmental variables or even as a properties file.
+
+Volumes::
+so now let's see another very important concept generally which is data storage and how it works in kubernetes 
+so we have this database pod that our application uses and it has some data or it generates some data with this set up that you see 
+now if the database container or the pod gets restarted the data would be gone and that's problematic and inconvenient obviously
+because you want your database data or log data to be persisted reliably long-term and the way you can do it in kubernetes
+is using another component of kubernetes called volumes
+
+Volumes::
+
+it basically attaches a physical storage on a hard drive to your POD 
+and that storage could be either on a local machine meaning on the same server node where the pod is running or 
+it could be on a remote storage meaning outside of the kubernetes cluster or 
+it could be a cloud storage or it could be your own premise storage which is not part of the kubernetes cluster.
+
+deployment::
+so now let's see everything is running perfectly and a user can access our application through a browser and when they set up 
+what happens if my application pod dies or I have to restart the pod because I built a new container image.
+So in this case basically I would have a downtime where a user can reach my application which is obviously a very bad thing if it happens 
+in production.
+and this is exactly the advantage of distributed systems and containers so instead of relying on just one application pod and one database pod etc
+we are replicating everything on multiple servers so we would have another node where a replica or clone of our application would run which will
+also be connected to the service 
+so remember previously we said the service is like a persistent static IP address with a DNS name so that you don't have to constantly adjust the end point when
+pod dies
+Now the service is also a load balancer which means that the service will actually catch the request and forward it to whichever POD is least
+busy so it has both of these functionalities.
+but in order to create the the second replica of the my application POD you wouldn't create a second POD but instead you would define
+a blueprint for in my application part and specify how many replicas of that pod you would like to run and that component or that blueprint 
+is called deployment which is another component of kubernetes.
+
+Stateful set::
+so now you're probably wondering what about the database POD because if the database POD died your application also wouldn't be accessible
+so we need database replicas as well however we can't replicate database using a deployment and the reason for that is because
+database has a state which is its data meaning that if we have clones or replicas of the database they would all need to access the same
+shared data storage and there you would need some kind of mechanism that manages which PODs are currently writing to that storage or which PODs are reading
+from that storage in order to avoid data inconsistencies and that mechanism in addition to replicating feature is offered by another kubernetes component
+called stateful set 
+so this component is meant specifically for applications like databases so mysql, MongoDB elasticsearch or any other state full applications or databases should be
+created using stateful sets and not deployments.
+
+
+https://kubernetes.io/docs/concepts/overview/components/
+Kubernetes Architecture:
+Components in Kubernetes:
+Kubernetes Master:
+				Kube API server(Kubectl)--> To create or update or delete any POD.
+											kube-apiserver is designed to scale horizontally—that is, it scales by deploying more instances. 
+											You can run several instances of kube-apiserver and balance traffic between those instances
+				Kube Scheduler 			--> It is responsible for scheduling the PODs across multiple nodes.
+											it watches for newly created Pods with no assigned node, and selects a node for them to run on.
+				Kube Controller manager	--> It monitors Cluster and POds health, 
+											that means it identifies if something wrong with any node or container so that it can able to replace with the new container/node
+				Cloud Controller Manager-->	If you host your kubernetes in any cloud then it can able to talk with the underlying cloud provider to manage nodes in cluster. 
+				etcd cluster(Database)	--> It is responsible for storing the important values related to the cluster like how many master nodes or how many worker nodes are there in a cluster etc.
+											Consistent and highly-available key value store used as Kubernetes backing store for all cluster data.
+Kubernetes Nodes :
+				Kubelet		--> It is an An agent that runs on each node in the cluster. It makes sure that containers are running in a Pod.
+				Kube Proxy	--> It is a networking component and it is responsible for establishing the connections between other nodes and Master.
+								kube-proxy maintains network rules on nodes. These network rules allow network communication to your Pods from network sessions inside or outside of your cluster.
+
+
+
+
+###Worker Node###
+
+so one of the main components of kubernetes architecture are its worker servers or worker nodes and each node will have multiple application pods
+with containers running on that node and the way Kubernetes does it is using three processes that must be installed on every node that are used to 
+schedule and manage those pods. so nodes are the cluster servers that actually do the work that's why sometimes also called worker nodes.
+
+container runtime(Docker)::
+so the first process that needs to run on every node is the container runtime.
+so because application pods have containers running inside, a container runtime needs to be installed on every node but the process that 
+actually schedules those pods and the containers then underneath is kubelet.
+
+kubelet::
+which is a process of kubernetes itself unlike container runtime that has interface with both container runtime and the machine the node itself 
+because at the end of the day kubelet is responsible for taking that configuration and actually running a pod or starting a pod with a container
+inside and then assigning resources from that node to the container like CPU, RAM and storage resources.
+
+Kube Proxy::
+3rd process that is responsible for forwarding requests from services to PODs is actually kube proxy.
+kube proxy also must be installed on every node and it has actually intelligent forwarding logic inside that makes sure that the communication also
+works in a performant way with low overhead.
+For example if an application, my app replica is making a request database 
+instead of service just randomly forwarding the request to any replica it will actually forward it to the replica that is running on the same
+node as the POD that initiated the request thus this way avoiding the network of sending the request to another machine.
+
+
+###Master Node###
+
+Kube API server::
+when you as a user want to deploy a new application in a kubernetes cluster then you need interact with the API server using some client 
+it could be a UI like kubernetes dashboard or it could be command line tool like kubelet or a kubernetes API(Kubectl)
+API server is like a cluster gateway which gets the initial requests of any updates into the cluster or even the queries from the cluster and it also
+acts as a gatekeeper for authentication to make sure that only authenticated and authorized requests get through to the cluster.
+that means whenever you want to schedule new pods deploy or new applications create new service or any other components 
+you have to talk to the API server on the master node and the API server then validate your request and if everything is fine then it will
+forward your request to other processes in order to schedule the pod or create this component that you requested and also 
+if you want to query the status of your deployment or the cluster health etc you make a request of the API server and it gives you the response 
+which is good for security because you just have one entry point into the cluster.
+
+Kube Scheduler::
+Another master process is a scheduler so as I mentioned if you send a request to an API server to schedule a new pod then API server 
+validates your request and later it will actually hand it over to the scheduler in order to start the application pod on one of the worker nodes 
+so first Scheduler will look at your request and see how much resources the application that you want to schedule will need how much CPU how much RAM and
+then it's gonna look at the worker nodes and see the available resources on each one of them and if it sees that any one node is the least busy or 
+has the most resources available it will schedule the new pod on that node.
+An important point here is that scheduler just decides on which node a new pod will be scheduled and the process that actually does the
+scheduling and creating a pod with a container is the kubelet.
+so kubelet gets the request from the scheduler and execute the request on that node
+
+
+Kube Controller manager::
+Kube Controller manager is another crucial component because what happens when pods die on any node there must be a way to detect
+that nodes died and then reschedule those pods as soon as possible. so what controller manager does is detect state changes like crashing of pods.
+for example so when pod die controller manager detects that and tries to recover the cluster state as soon as possible and for that it makes a request
+to the scheduler to reschedule those dead pods in the same cycle happens here where the scheduler decides based on the resource calculation which worker
+node should restart those pod again and makes requests so the corresponding kubelets on those worker nodes do actually restart the pods. 
+
+etcd store::
+you can think of it as a cluster brain
+actually which means that every change in the cluster for example when a new pod gets scheduled when a pod dies all of these changes get saved or updated
+into this key value store of etcd.
+and the reason why etcd store is a cluster brain is because all of these mechanism with scheduler, controller manager exetra works because of etcd data. 
+so for example how scheduler know what resources are available on on each worker node or how does controller manager know that a
+cluster state changed in some way for example pods died or that kubelet restarted new pods upon the request of a scheduler or when you make a query
+request to API server about the cluster health or for example your application deployment state where as API server get all this state information from so all
+of this information is stored etcd.
+what is not stored in etcd key value store is the actual application data
+for example if you have a database application running inside of the cluster the data will be stored somewhere else not in the etcd
+this is just a cluster state information which is used for master processes to communicate with them work processes and vice versa.
+
+
+
+
+############ Kubernetes Cluster Setup Using Kubeadm
+https://devopscube.com/setup-kubernetes-cluster-kubeadm/
+
+
+
+############Kubernetes Cluster Setup Using kops
+
+Below are prerequisites to setup kubernetes cluster on aws using kops:
+>AWS account 
+>Create a Domain to Access Kubernetes API
+>Create a Hosted Zone in Route53 and point AWS nameserver to Domain
+>Create a S3 bucket with Versioning Enabled to store Kubernetes Kops cluster state
+>IAM user with full S3, EC2, Route53 and VPC access 
+>Ubuntu 20.04/18.04/16.04 LTS with minimal installation
+>AWS-CLI
+
+
+Step #1: Install AWS CLI on Ubuntu
+
+sudo apt-get update
+sudo apt-get install awscli
+aws --version
+
+Step #2: Install Kubectl Binary with CURL on Ubuntu
+
+>Download kubectl binary with curl on Ubuntu using below command
+sudo curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
+>Make the kubectl binary executable
+sudo chmod +x ./kubectl
+
+>Move kubectl to /usr/local/bin/kubectl directory
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+Step #3: Install KOPS on Ubuntu Instance
+
+>Download the KOPS  setup on Ubuntu using curl
+curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+
+>set the execution permission
+sudo chmod +x kops-linux-amd64
+
+>move the kops to /usr/local/bin directory
+sudo mv kops-linux-amd64 /usr/local/bin/kops
+
+Step #4: Creating Domain and Hosted Zone in AWS
+
+>Kubernetes kops need DNS to discover within cluster and to connect Kubernetes API Server from Clients
+>You can create either public or private hosted zone, if you created public hosted zone you have to point AWS nameservers in Domain.
+
+Go to route53 in aws console and create hosted zone.
+give your domain name as k8.domainname and select public hosted and click on create hosted zone then you will see an out put like below having Name servers for your domain.
+
+Output::
+ns-1817.awsdns-35.co.uk.
+ns-1509.awsdns-60.org.
+ns-555.awsdns-05.net.
+ns-306.awsdns-38.com.
+
+now go to godaddy --> Manage DNS -->point all these AWS nameservers in Domain with 600s TTL.
+
+Step #5: Create and configure IAM User in AWS
+
+>Create IAM user in AWS using login console -> IAM -> ADD User -> Username -> Select Programmatic access -> then you will get Access Key ID and Secret Access Key.
+
+Step #6: Create IAM User with full S3, EC2, Route53 and VPC access in AWS
+
+Now create IAM user with full S3, EC2, Route 53 and VPC access in your AWS account as shown below
+
+AmazonS3FullAccess 
+AmazonEC2FullAccess 
+AmazonRoute53FullAccess 
+IAMFullAccess 
+AmazonVPCFullAccess
+
+>Configure AWS CLI with your Access Key ID,  Secret Access  key and region
+
+aws configure
+/*to configure AWS CLI in server
+
+Step #7: Creating S3 Bucket using command line
+
+>Create the S3 bucket to store Kubernetes cluster states
+aws s3 mb s3://<domainname>
+
+>Enable versioning on S3 bucket
+aws s3api put-bucket-versioning --bucket <domainname> --versioning-configuration Status=Enabled
+
+>Export kops state
+export KOPS_STATE_STORE=s3://<domainname>
+
+Step #8: Create SSH Keys
+
+>Create ssh keys on Ubuntu instance to exchange kubernetes cluster and connect
+ssh-keygen 
+
+Step #9: Setup Kubernetes on AWS using KOPS
+
+>if you want to install calico networking along with setup of Kubernetes KOPS add –networking with calico as shown below	
+
+kops create cluster --cloud=aws --zones=ap-south-1a --networking calico --name=k8s.<domain name> --dns-zone=<domain name> --dns public
+
+/*replace zones as per your instance and name as well
+
+
+kops update cluster --name <domain name> --yes --admin
+/* to update the cluster
+
+>Validate the Kubernetes KOPS cluster
+
+kops validate cluster
+/* wait for 10 mins atlease and check validate cmmnd o/p then u will see cluster success
+
+
+
+
+
+
+
+
+
+
+////////Pod ////
+A pod is one or more containers that logically go together.
+Pods run on nodes. Pods run together as a logical unit. So they have the same shared content. 
+They all share the same IP address but can reach other Pods via localhost, as well as shared storage. 
+Pods don’t need to all run on the same machine as containers can span more than one machine. One node can run multiple pods.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+kubectl get nodes
+/* to know the number of nodes in a cluster
+
+docker image ---> Pod
+
+kubectl run <pod name> --image=<imagename>
+/* to create a pod from image
+
+kubectl get pods
+/*to know the status
+
+kubectl describe pod <podname>
+/*to know in detail info of a pod
+
+kubectl delete pod <pod name>
+/* to delete pod
+
+
+##Manifest file is just like a docker file having all the information of an image to create a POD
+
+Arguments in Manifest file:
+>apiVersion: --->Need to mention the version here 
+>kind: ---> Need to mention for creating what we are writing this manifest file like POD/Deployment/Service/LoadBalancer
+>metadata: ---> Here we have POD information
+	name:
+	labels:
+	role:
+>spec: --->specificatons
+	Containers:
+	-name:
+	 image:
+	 ports:
+		name:
+		conatiner port:
+		protocol TCP:
+		
+-->name + labels we call them as siblings in manifest file
+		
+
+POD -->Deployment --> service --> load balancer
+
+We cant expose POD directly so we need to create deployment for that pod and we need to create service to expose that deployment.
+Finally we need to create loadbalancer for service to access from out with high availability.
+ 		
+
+
+
+https://kubernetes.io 
+/* you can get the sample manifest files from here
+
+
+##########Manifest file for POD
+# Run this command on the node where kubelet is running
+
+cd /opt/vi nginx-pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myfirst-pod
+  labels:
+    role: myrole
+spec:
+  containers:
+    - name: web
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+
+
+
+
+kubectl apply -f <manifestfilename.yml>
+/* to create a pod from manifest file
+
+kubectl get pods
+/*to know the pods
+
+kubectl delete pod <pod name>
+/* to delete the POD
+
+
+######Manifest file for Deployment
+
+sudo vi nginx-deploy.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-app
+  template:
+    metadata:
+      labels:
+        app: nginx-app
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+
+
+kubectl apply -f <manifestfile.yml>
+/*to create deployment
+
+kubectl get deploy
+/*to know the deployments
+
+
+kubectl pods -o wide
+/*to know on which node the pod was deployed and the status of deployment we will get to know here
+
+
+######Manifest file for service
+
+sudo vi nginx-svc-np.yml
+
+apiVersion: v1
+kind: service
+metadata:
+  name: my-service
+  labels:
+    app: nginx-app
+spec:
+  selector:
+      app: nginx-app
+  type: Nodeport
+    metadata:
+   ports:
+        - Nodeport: 31111
+		  port: 80
+		  targetport: 80
+
+
+kubectl apply -f <manifestfile.yml>
+/*to create service
+
+kubectl get svc
+/* to know running services
+
+
+
+####Manifest file for loadbalancer
+
+
+sudo vi loadbalancer.yml
+
+apiVersion: v1
+kind: service
+metadata:
+  name: nginx-app
+  labels:
+    app: nginx-app
+spec:
+  selector:
+      app: nginx-app
+  type: loadbalancer
+  ports:
+   - port: 80
+	targetport: 80
+
+kubectl apply -f loadbalancer.yml
+/*create loadbalancer
+
+Here we can access our deployed application through DNS instead of ip and protocol since load balancer assign differnt port numbers
+based on the pods availability.
+
+
+
+##########Rolling Updates
+
+kubectl get rs
+/*to know the number of replica sets
+
+kubectl describe deploy <name of the deployment>
+/*to know the full description of a deployment
+
+kubectl get rollout undo deployment <deployment name>
+/*to rollback or undo the changes of previous version 
+
+
+##blue-green deployment
+It means:
+While the application is running in production server, if there is any update available for the application then we can deploy and test the 
+V2 application while V1 is going on and if everything is working fine then we can flip the V2 to with V1.
+

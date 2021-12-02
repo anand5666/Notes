@@ -1,0 +1,102 @@
+MySQL is the most popular open-source relational database management system. It is fast, easy to use, scalable
+
+my sql version 5.7
+
+
+//// Installation
+
+sudo apt update
+
+sudo apt install mysql-server
+/*install the MySQL package
+
+sudo systemctl status mysql
+/*to check whether the MySQL server is running
+
+//Securing MySQL
+MySQL server package comes with a script called mysql_secure_installation that can perform several security-related operation, Run the script by using below command
+
+sudo mysql_secure_installation
+
+/*On the next prompt, you will be asked to set a password for the MySQL root user(eg: psswd: test@123). Once you do that the script will also ask you to remove the anonymous user, restrict root user access to the local machine and remove the test database. You should answer “Y” (yes) to all questions.
+
+now you have successfully installed mysql and secured it. 
+
+mysql --version
+
+---------------------------------------------------------------------------
+systemctl status mysql.service
+
+systemctl restart mysql.service
+
+/*to start or restart mysql service
+
+
+mysql -u root -p
+/*to log in to mysql database
+
+show databases;
+/*to check the databases
+
+create database <database name>;
+/* to create database
+
+drop database <database name>;
+/*to remove database
+
+
+use <database name>
+/*to login to a perticular database
+
+
+show tables;
+/*Data stored in databases in the form tables and we can see the tables inside a data base using below command
+
+
+mysqldump -u <username> -p <databasename> > <destination path/filename.sql>
+/*to take the backup of anyperticular database
+Eg: mysqldump -u root -p fundstransfer > /opt/Funsdstrf.sql
+
+
+mysql -u <user name> -p <database name> < <source path/filename.sql>
+/*to restore the backup of any perticular database
+
+Eg: mysql -u root -p fundstransfer < /opt/Funsdstrf.sql
+
+
+/// Create MySQL Remote User
+
+mysql -u root -p
+/* Login to MySQL using username root and password
+
+CREATE USER '<username>'@'%' IDENTIFIED BY '<passwd>';
+/*create user
+
+GRANT ALL PRIVILEGES ON * . * TO '<username>'@'%';
+/* to give all access to created user ----> here '.' represents permissions to all databases to created user. if we replace . with any database name then the created user will get the access for that perticular database only.
+
+FLUSH PRIVILEGES;
+/* to update the databases once the user created
+
+ SELECT User,Host FROM mysql.user;
+/*to see the list of users
+
+https://www.cyberciti.biz/faq/how-to-delete-remove-user-account-in-mysql-mariadb/
+
+
+
+//////////////////////////RDS///
+
+Amazon Relational Database Service (Amazon RDS) makes it easy to set up, operate, and scale a relational database in the cloud. It provides cost-efficient and resizable capacity while automating time-consuming administration tasks such as hardware provisioning, database setup, patching and backups.
+It frees you to focus on your applications so you can give them the fast performance, high availability, security and compatibility they need.
+
+Our responsibility::
+creating user name & passwrd
+datbase endpoint url and give those details to developers.
+
+----> mysql database port number 3306
+
+----> rds backups we call those as snapshots
+
+
+	

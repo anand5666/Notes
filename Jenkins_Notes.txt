@@ -1,0 +1,206 @@
+///Jenkins Installation
+
+Prerequisites::
+java 8
+
+step1 ::First, add the repository key to the system:
+
+wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+
+/*When the key is added, the system will return OK. Next, append the Debian package repository address to the server’s sources.list:
+
+step2 ::
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+
+/*When both of these are in place, run update so that apt will use the new repository:
+
+sudo apt update
+
+/*Finally, install Jenkins and its dependencies:
+
+sudo apt install jenkins
+/*Now that Jenkins and its dependencies are in place, we’ll start the Jenkins server.
+
+step3 ::
+Let’s start Jenkins using systemctl:
+
+sudo systemctl start jenkins
+
+/*Since systemctl doesn’t display output, you can use its status command to verify that Jenkins started successfully:
+
+sudo systemctl status jenkins
+
+/* If everything went well, the beginning of the output should show that the service is active and configured to start at boot:
+
+Output
+● jenkins.service - LSB: Start Jenkins at boot time
+   Loaded: loaded (/etc/init.d/jenkins; generated)
+   Active: active (exited) since Mon 2018-07-09 17:22:08 UTC; 6min ago
+     Docs: man:systemd-sysv-generator(8)
+    Tasks: 0 (limit: 1153)
+   CGroup: /system.slice/jenkins.service
+
+
+
+Note:: 	/etc/default/jenkins ----> here you can see the jenkins port number.
+
+		/opt/projectservices/tomcat_9/conf/server.xml here you can see the tomcat port number.
+
+
+
+give user privilages to jenkins in sudoers file
+/* jenkins ALL=(ALL) NOPASSWD: ALL
+
+//////////////Ubuntu firewall
+/* If you are installing Jenkins on a remote Ubuntu server that is protected by a firewall you’ll need to open port 8080. Assuming you are using UFW to manage your firewall, you can open the port with the following command:
+
+sudo ufw allow 8080
+
+sudo ufw status
+
+
+Note: If the firewall is inactive, the following commands will allow OpenSSH and enable the firewall:
+
+sudo ufw allow OpenSSH
+sudo ufw enable
+
+done open jeskins now by using <URL>:8080
+
+
+-------------------------------------
+
+/*if you forgot jenkins login creds go to config.xml and change useSecurity to false and then restart jenkins.
+
+sudo vi /var/lib/jenkins/config.xml
+
+
+
+/*Enviromental variable::
+java path default::
+/usr/lib/jvm/java-11-openjdk-amd64/bin
+
+
+
+
+
+//////List of Plugins we use frequently
+
+1.New
+
+2.list view
+
+3.nested view
+
+4.restart
+/*http://18.234.102.90:8080/restart
+
+5.saferestart
+/* this plug in restart jenkins only when the jenkins is free
+
+6.discard old builds
+/* it will disacard old builds and free up the space to run server smoothely
+
+///Bulid trigger plugins
+
+7.Trigger builds remotely (e.g., from scripts)
+
+8.Build after other projects are built
+
+9.Build periodically
+
+10.GitHub hook trigger for GITScm polling
+
+11.Poll SCM
+
+///Global tool configuration plugins
+
+12.Build executor
+
+13.Restrict where this project can be run
+/* to run build remotely on other node
+
+14.ThinBackup
+
+15.Periodic Backup
+
+//Build Environment
+
+16. Add timestamps to the Console Output
+
+17. Abort the build if it's stuck
+
+18. Execute shell
+
+19.disk-usage
+/* to check how much disk space a job is taking.
+20.Metrics Disk Usage
+
+21.Email notifications
+
+22. set build number
+
+23. workspace clean up
+
+
+//////// Email notification errors::
+If you are not able to link your email account to jenkins with sign in errors then enable less secure apps access in google accounts security
+
+and also use the below link for captha 
+Below link is to disable asking for captcha when signing in from a device
+https://accounts.google.com/b/0/DisplayUnlockCaptcha
+
+
+
+///////////Steps to create and give user access to jenkins
+
+Steps to create a new user in Jenkins with only READ access::
+
+Steps to create a new user::
+
+Login into Jenkins
+Go to Manage Jenkins
+Go to Create Users
+Enter all the details – Username, Password, Confirm Pwd, FullName, Email
+
+Select Create User:
+Steps to assign only read access:
+Login to Jenkins
+Go to Manage Jenkins
+Go to Configure Global Security
+Select Jenkins own User Database
+Tick the checkbox “Allow Users to Sign Up”
+Select Matrix-based security
+Select the button “Add user or group”
+Write User or Group name – write the user name of the user you created
+Tick 3 read option under – Overall, Job, View
+Save and Apply
+
+
+
+
+
+
+
+Errors::
+
+Running sudo apt-get update on my AWS EC2 Ubuntu 18.04.01 LTS instance fails because my Certificate verification failed: The certificate is NOT trusted. The certificate issuer is unknown when trying to access the deb.nodesource.com/node_10.x bionic Release
+solution:
+sudo apt install ca-certificates
+/* after installing ca-certificates above error got resolved
+
+
+
+pipeline build error
+solution:
+java.lang.NoSuchMethodError: No such DSL method 'stages' found among steps
+/* this mean someting wrong with the pipeline syntax, make sure spaces and brackets opened and closed properly or respective plugins might  be missed
+
+
+The JAVA_HOME environment variable is not defined correctly
+solution:
+JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+export JAVA_HOME
+
+
+

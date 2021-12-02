@@ -1,0 +1,280 @@
+
+
+
+//////volumes(nothing but disk/storage)
+
+snapshot --> taking the back up of a volume
+
+simple steps to use/copy a volume of one server to another server::
+take existing volume backup ---> snapshot ---> convert snapshot to volume ---> now we can attach volume to another server
+
+
+steps to resize ec2 volumes/storage:
+
+1: copy the instances id
+2: click on volumes and filter with instance id
+3: select the instance and click on actions and modify volume
+4: select required size and hit modify
+5: restart server and check the storage now(df -h)
+
+note: we cant downgrade the volume sizes.
+
+
+//process to create a seperate external volume and attaching it to the existing server.
+
+lsblk
+/* to list the block storages
+
+now create a volume of your required size in you aws console later follow below steps to attach that volume to existing EC2 instance
+
+Mount an EBS volume to EC2 Linux::
+
+Step1 : Now, login to your ec2 instance and list the available disks using the following command.
+Lsblk
+
+Step 2: Check if the volume has any data using the following command.
+sudo file -s /dev/xvdf
+
+Step 3: Format the volume to ext4 filesystem  using the following command.
+sudo mkfs -t ext4 /dev/xvdf
+
+Step 4: Create a directory of your choice to mount our new ext4 volume. I am using the name “newvolume”
+sudo mkdir /newvolume
+
+Step 5: Mount the volume to “newvolume” directory using the following command.
+sudo mount /dev/xvdf  /newvolume/
+
+Step 6: cd into newvolume directory and check the disk space for confirming the volume mount.
+cd /newvolume
+df -h .
+
+finished
+
+To unmount the volume, you have to use the following command.
+umount /dev/xvdf
+
+Note::
+By default on every reboot the  EBS volumes other than root volume will get unmounted. To enable automount, you need to make an entry in the /etc/fstab file.
+
+///EBS Automount on Reboot
+
+1.	Back up the /etc/fstab file.
+sudo cp /etc/fstab /etc/fstab.bak
+
+2. Open /etc/fstab file and make an entry in the following format.
+
+device_name mount_point file_system_type fs_mntops fs_freq fs_passno
+Example:
+/dev/xvdf       /newvolume   ext4    defaults,nofail        0       0
+
+3.Execute the following command to check id the fstab file has any error.
+sudo mount -a
+
+
+
+
+
+
+
+////////////////////////IAM(Identity access management) & S3(Simple Storage)
+
+
+IAM user creation::
+
+Step1:
+Access key - programatic access
+if we want to connect to aws from server(by using AWS configure in server) then we need to give programmatic access
+
+Password - AWS Management console access (If an user want to access AWS console by using IAM role we need to enable this)
+
+Step2:
+we can give existing user privilages as it is to the newly creating user
+or
+Attach existing policies  (like EC2 full access, S3 read only, Volumes full access etc)
+
+step3:
+
+then we can create a user and save CSV file for passwords
+
+
+
+
+
+
+
+
+
+
+
+###########################  VPC  ############
+https://www.youtube.com/watch?v=b1b6JTYnbjU&t=520s
+
+We need to know few things about IP address before knowing about VPC.
+
+IP Address: internet protocol address is a logical, numerical label assigned as a unique identity to each device in a network.
+It consists 32 bits having two parts those are  Network ID(16 Bits) + Host ID(16 Bits).
+Eg: My IP address (203.192.204.79)
+Ip address consists of 32 bits means 4 octets each octet consisting of 8 bits.
+
+
+CIDR —(Classless Inter-Domain Routing): It is a methodology for IP address allocation and route aggregation. 
+
+let's take an illustration 172.31.0.0/16 
+The /16 part here represents the number of bits present in the network id.
+that means first 16 bits out of this 32 bits which are locked.
+It signifies that the remaining 16 bits out of this 32 bits are available for use in the network
+therefore the total bits which are available to be used in the network are 32-16 =16 
+therefore the total number of ip addresses which can be generated from this 16 bits is 2 power 16
+
+This ip address is a much larger network wherein you have provisioned it with the larger number of ip addresses which can be assigned within this network
+whereas in this iP address the number of ip addresses available to be used within this network are very small 
+therefore CIDR reduces the wastage of ip addresses by providing the exact required number of iP address to the users.
+It is also a methodology by which we can gauge the vastness or the largeness of the network it has been assigned to
+
+
+Virtual private cloud (VPC) — A virtual network dedicated to your AWS account.
+AWS provides a lot of services, these services are sufficient to run your architecture.
+The backbone for the security of this architecture is VPC (Virtual Private Cloud). 
+VPC is basically a private cloud in the AWS environment that helps you to use all the services by AWS in your defined private space.
+You have control over the virtual network and you can also restrict the incoming traffic using security groups.
+
+Overall, VPC helps you to secure your environment and give you a complete authority of incoming traffic. 
+There are two types of VPCs, Default VPC that is by default created by Amazon and 
+Non-Default VPC that is created by you to suffice your security needs.
+
+
+Key components of VPC:
+-----------
+Internet gateway --> A gateway that you attach to your VPC to enable communication between resources in your VPC and the internet.
+
+NAT(Network Address translation) Gateway --> It enables instances in the private subnet to access the internet or other aws resources
+but it prevents the internet from initiating connections into the instances so it's a one-way communication
+
+DNS --> standard which resolve names used over the internet into ip address
+
+Elastic ip --> It is a static iP which never changes
+
+VPC endpoint --> vpc end points private connection between your vpc and other aws services without using internet
+Means it Enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. 
+Instances in your VPC do not require public IP addresses to communicate with resources in the service. 
+Traffic between your VPC and the other service does not leave the Amazon network.
+
+network interface -->A point of connection between a public and private network
+
+egress only IG--> allows only outbound communication from ec2 over ipv6 
+
+route table —  it defines how a traffic is routed between each subnet.
+A set of rules, called routes, that are used to determine where network traffic is directed.
+
+VPC Peering --> connection between vpcs
+-------------
+
+Subnet —-> A range of IP addresses in your VPC.
+Subnets are like breaking a large network into sub-networks. Maintaining a smaller network is easy as compared to maintaining a large network.
+We have 2 types of Subnets 
+
+1. Private Subnet --> Mainly used for database and Application server 
+2. Public Subnet  --> Mainly used for external facing applications like webserver 
+
+
+
+
+
+
+AWS VPC Hands on::
+
+Step1: Create a VPC 1st on AWS
+Step2: Create Subnets(Public/Private) in our VPC now.
+Step3: Create route tables for each subnet in our VPC.
+Step4: Assign the subnets to the respective VPCs.
+Step5: Create an Internet Gateway(I-GW) and attach to your VPC.
+Step6: Add the I-GW to the public subnet route table since public subnet needs to talk with internet
+ Now you can launch the instances with our VPC
+Step7:If you want your private subnet to access the internet then  create an NAT Gateway(NAT-GW) in the public subnet and allocate an elastic IP.
+Step8:Now go to private Subnet route table and attach our NAT-GW route.
+Now your private subnet also can access the internet.
+ 
+
+
+
+
+
+
+//Auto Scaling//////////
+https://github.com/mavrick202/ansibletemplatetesting/blob/master/ubuntushellscript
+
+Whenever the CPU is overloaded/Network traffic rised then by default cloud launches new instances with the help of AMIs this is what auto scaling.
+
+#!/bin/bash
+apt update
+apt install software-properties-common -y
+apt-add-repository --yes --update ppa:ansible/ansible
+apt update
+apt install ansible -y
+apt install nginx -y
+apt install python-apt -y
+apt install git -y
+apt install stress -y
+git clone https://github.com/mavrick202/ansibletemplatetesting.git /myrepo
+######USE aws-autoscaling branch for testing aws autoscaling##########################
+######GIVE ONLY ABOVE IN THE USER DATA FOR AMI IMAGE FOR AWS AUTOSCALING##########
+#
+#####GIVE BELOW IN THE LAUNCH CONFIG USERDATA#####################################
+ansible-playbook /myrepo/playbook.yaml
+
+
+
+Requirements::
+Nginx - for storing the AMI
+apt-get install stress
+/* for putting the artificial load on CPU to test whether auto scaling is happening or not.
+please install stress before taking AMI
+
+step1 : Create AMI
+step2 : 
+Create LAUNCH Configuration(server type, keypair, security group, AMI)
+	> click on launch configuration.
+	> Click on my AMI and choose the instance type(t2 micro or smethng) or else here you can select a new AMI as well then a complete new server will launch.
+	> click on Configure details give name  and IAM role  if required and also if we need to perform few activities simultaneously
+	 while launching the server then we can give the respective commands as a script in user data option.
+	> Add storage and Security group and then review and launch.
+
+Step3:
+Create a load balancer and target group
+	> give target group name
+	> give protocol, port and VPC
+now create a network load balancer
+	> give name 
+	> select your VPC and subnets 
+	> Go to configure routing select the target group and review and create. 
+
+step4:
+Autoscaling group (need to define when the autoscaling should occur)
+	> select our launch configuration from the list 
+	> Give group name and give group size.
+	> select your VPC and respective subnets for which you need this Auto scaling 
+Go to advance details
+	> Check on receive traffic from one more load balancer
+	> give target groups.
+	> click on Health check type : 
+		EC2 if you select HC type as EC2 then if something wrong with the Nginx then the Load balancer wont send the traffic to the EC2)
+		ELB(Elastic load balancer)but if we select ELB then the load balancer will send the traffic and if the traffic fails in the specified 
+		time(HC Grace period) then ELB will terminate that instance and launch a new instance.
+		so please select ELB here.
+	> Configure scaling policies and click on use scaling policies to adjust the capacity of this group
+	give the scale between instances for example 1 to 3
+	> now click on scale the auto scaling using simple step 
+	there define the policy or alarm for when to scacle up or down.
+	> we can add notifications by using SNS and then review and create the Auto scaling group.
+
+Done.
+
+Note: If we want to maintain limited number servers when we have less traffic like during weekend then we can schedule that one as well
+      in autoscaling group.
+	  
+
+Steps to disable autoscaling
+Step1: Delete autoscaling group
+step2: delete the launch configuration
+step3: terminate load balancer and terminate instaces.
+step4: remove target groups as well.

@@ -1,0 +1,182 @@
+“Sure, so, my name is anand and I am 27 years old.
+
+I have completed my post graduation(M.tech) in 2018 in the stream of ECE specialized in embedded systems. 
+Later i have started my career with STRATYCON TECHNOLOGIES PRIVATE LIMITED.
+so For the past 3 and half years, I’ve been working as a devops engineer at STRATYCON TECHNOLOGIES PRIVATE LIMITED.
+so I used to work with Jenkins, maven, git and artifactory during initial days of my career later I have started working with the docker, ansible and kubernetes as well.
+
+Roles and Responsiblilities:
+Build and Release Engineer:
+So i have started here as a  Build and Release Engineer, so on that time i was Responsible for the building and deploying the artifacts into DEV(Development ), SIT(System Integration Test) and QA Environments.
+ - Management of Customer Requirements and documentation of the Project Plan as per the requirements
+ - Maintained and Administered GITHUB Source Code Tool. 
+ - There i used to create repositories in git hub and giving collobration access to the developers.
+ - Created Branches, Labels and performed Merges in Stash and GITHUB.
+ - Resolving Conflict Errors with the help of developers.
+ - And also i used to give the the KT to freshers on GIT.
+ - Used Jenkins for Automating Builds and Automating Deployments. 
+ - Integrated GITHUB into Jenkins to automate the code check-out process. 
+ - Developed build and Deployment Scripts using MAVEN as build tools in Jenkins to move from one environment to other environments.
+ - Managed Build results in Jenkins and Deployed using workflows.
+ - Maintain and track inventory using Jenkins and set alerts when the servers are full and need attention.
+ - Used JIRA for change control & ticketing.
+ - Worked closely with software developers to debug software and system problems.
+ - Formulated and executed designing standards for DNS servers.
+
+
+Later my role was changed completely as a DevOps Engineer
+Role: DevOps Engineer:
+- Worked on variety of UNIX platforms like Ubuntu 18.0x which includes installation, configuring and maintenance of applications for prod/stage/dev environments.
+- Working with cloud endure for migration and DR(Disaster recovery) with AWS.
+- Performing cloud migrations from (physical, virtual and cloud based) to cloud
+- Monitoring and reporting statistics of data in sync source and remote replication sites.
+- Working with AWS Cloud Services EC2 , Security Groups, Elastic IP's, Load balancers, Auto scaling groups, S3, EBS, VPC, Cloud watch, IAM, Cloud Formation.
+- Maintaining user, groups, Roles, Policies with Amazon Identity Access Management(IAM)
+
+- Create and maintain highly scalable and fault tolerant multi-tier AWS environment spanning across multiple availability zones using Terraform and CloudFormation.
+
+- Creating the automated build and deployment process for application and leading up to building a continuous integration system for all our products using Jenkins.
+- Troubleshoot the build issues during the Jenkins build process.
+- Installation and administrations of Linux Operating Systems (Ubuntu, CentOS, RedHat)
+- Configuration management and deployments using Anisble
+- Used to write some Ansible scripts.
+- Reporting regular status in standup calls.
+
+
+
+
+ANSIBLE & JENKINS
+
+
+●	Built and Deployed Java source code to Tomcat Application servers and automated the whole process.
+●	Design and Configure release process through Jenkins
+●	Monitor Jenkins jobs and contact team if progress is not evident on fixing stability issues
+●	Responsible for supporting releases in test servers and also in production servers.
+
+●	Design the environment with options of automations to build to reduce the risk of manual error and time consumption during depoyment.
+
+●	Perform manual builds to troubleshoot issues occurring from inconsistent codes on the different environments and email the team when the build and deployment is completed.
+
+●	Involve in release planning and executed the release build request from the project team through emails.
+
+●	Created Jenkins CICD pipelines for continuous build & deployment and integrated SonarQube in Jenkins for Code quality check.
+
+●	Deploying the applications to Tomcat Application Server and static content to apache web servers.
+
+●	Good knowledge in dealing with inventory file and host patterns in adding hosts to inventory  and calling hosts.
+●	 Used variable section in many playbooks to take the advantage of variables instead of hard coding.
+●	Used ansible vault to secure information like passwords and secret key files.
+●	 Good complete hands on experience of using Ansible roles by including all sections inside ansible playbook.
+●	Good knowledge in using multiple ansible modules as and when required and their usage.
+●	 Created many user accounts in Jenkins and given limited privileges to them to ensure security is there in each and every stage by using Jenkins roles.
+●	 Created many link projects and configured upstream and downstream projects.
+●	Responsible to establish complete pipeline work flow starting from pulling source code from git         repository till deploying end product into servers.
+
+
+ DOCKERS & KUBERNET
+ 
+ 
+ r5
+
+●	Good Expertise on Docker-compose, Docker Hub and Swarm
+●	Utilized Docker for the runtime environment of the CI/CD system to build, test deploy.
+●	Having good hands on experience in using docker images from docker hub as well as creating our own docker images form docker containers.
+●	Created private docker registry to  store docker images so that only project members can able to access to make sure that security is at its peaks. 
+●	Good hands on experience in sharing docker volumes among containers and between container and host and Created docker volumes to provide high availability to data even if any of the docker container goes down
+●	Deployed applications (WAR) to the Tomcat server using Docker containers.
+●	Well aware of pod limitations and how to address those issues by using high level K8S abstractions like Replica sets, Deployments, Volumes and Services.
+●	Good understanding of K8S master node components like kube-api server, kube-scheduler and etcd store which forms control plane.
+
+
+Prerequisites for cloud endure:
+cloud endure URL ports should be enabled in your firewall.
+enable s3 bucket.
+
+we can register to cloud endure service
+need to create a project
+Need to create AWS IAM user and need to update those creds (access key id in cloud endure)
+replication settings 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############Virtusa QAs
+
+> Branching strategies
+
+> Maven Goals
+
+> how you will give user access to jenkins
+
+Steps to create a new user in Jenkins with only READ access::
+
+Steps to create a new user::
+
+Login into Jenkins
+Go to Manage Jenkins
+Go to Create Users
+Enter all the details – Username, Password, Confirm Pwd, FullName, Email
+
+Select Create User:
+Steps to assign only read access:
+Login to Jenkins
+Go to Manage Jenkins
+Go to Configure Global Security
+Select Jenkins own User Database
+Tick the checkbox “Allow Users to Sign Up”
+Select Matrix-based security
+Select the button “Add user or group”
+Write User or Group name – write the user name of the user you created
+Tick 3 read option under – Overall, Job, View
+Save and Apply
+
+
+> Docker prune
+
+> How to attach volume to docker container
+
+> EBS and S3 difference
+
+> Deployment strategies in your organisation
+
+> Security groups and ACL in AWS
+
+> Branching Strategies
+
+> namespaces
+
+> modules in ansible
+
+> Dependency Management
+
+
+>Articatory storage location
+
+
+
+
+##################TCS
+
+> Sonar qube properties
+> how to create service account in kubernetes cluster
+> how to create user in kubernetes cluster
+> what is role binding in kubernetes and purpose of create a role binding
+> how do you define resource in kubernetes
+> kubernetes namespaces
+> how do you access the service file from outside in kubernetes and ingress overlay
+> how do you take backup of kube etcd
+> how do you integrate kubernetes with jenkins
+> pod disruption budget
+> kubernetes readiness probe and liveness probe
+> state file in terraform
+> Are we able to block an IP in AWS security groups.

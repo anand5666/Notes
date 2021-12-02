@@ -1,0 +1,211 @@
+https://www.youtube.com/watch?v=qw3gBhAz7qc&list=PL5nViEmyYI0ZEq6DtuDuFajiCmpEA6V7n&index=9&t=1046s
+
+Shell scripting or programming mostly consists of the features which today’s modern programming languages offer.
+Right from simple to complex script can be developed using Shell Scripting. 
+It is nothing but a series of UNIX commands written in a plain text file to accomplish a specific task. And also with the help of 
+shell scripting, tasks of the day to day life can be automated.
+
+With Linux default script or a shell you will get is the bash shell.
+shell is a small program which will help a user to interact with the operating system.
+
+
+Basics::
+
+.sh is the extension of a shell script (eg: sample.sh)
+
+Compiler - converts the source code into machine level code.
+Interpreter- execute the code line by line
+
+#!usr/bin/bash --> this is 1st line of a shell script called as magic line(#!) or she-bang line.
+                   This is an interpreter(Bash shell) where our script is actually executes.
+					Bydefault linux will use bash shell.
+
+which <command>
+/*to know the location of our command. 
+/*(eg:which ls) this will give where ls command is located.
+in the same way we can check where bash shell(interpreter) is located by using which bash
+
+
+file <filename>
+/* to check what kind of file it is. perticualrly whether the file is executable or not
+
+sh <name>.sh
+./ <name>.sh
+/*for executing the shell script 
+
+
+sample program::
+
+#!/bin/bash
+#program for sum of 2 numbers
+
+echo "Enter 1st number";
+read a;
+echo "Enter 2nd number";
+read b;
+sum = `expr $a + $b`;
+echo "sum of two numbers is $sum";
+
+------------
+
+
+
+
+
+
+
+
+
+
+
+////to assign the crontab for any script and to let them run periodicaly
+crontab -e 
+press 1 for assigning crontab in nano editor
+
+* * * * * <scriptpath/scriptname.sh>
+/* here script will execute every minute
+and then save
+
+
+/////////Few shell scripts
+
+#Clearing cache and Buffer scripts:
+
+free
+/*this command to is to know the how much buffer or cache present.
+
+free -h
+/* -H flage is used to know the size in MBs
+
+////script
+
+#!/bin/bash
+#script for clearing cache and swap memory when it reaches 90%
+a=$(vmstat -s | awk  ' $0 ~ /total memory/ {total=$1 } $0 ~/free memory/ {free=$1} $0 ~/buffer memory/ {buffer=$1} $0 ~/cache/ {cache=$1} END{print (total-free-buffer-cache)/total*100}')
+echo ${a%.*}
+echo "Present cache and swap memory is  $a"
+if [ ${a%.*} -ge 85 ];then
+
+#here %.* to convert decimal a value into percentage
+
+echo "clearing cache"
+
+echo 3 > /proc/sys/vm/drop_caches && swapoff -a && swapon -a && printf '\n%s\n' 'Ram-cache and Swap Cleared'
+else
+
+echo "No Need to clear cache right now"
+fi
+
+save as clearcache.sh in opt directory
+
+
+----------------------------------------------------------------
+
+Mysql backups:
+
+
+YEAR=`date +%Y`
+MONTH=`date +%m`
+DAY=`date +%d`
+HOUR=`date +%H`
+
+sudo mkdir -p $YEAR/$MONTH/$DAY/$HOUR
+#this command is to create nested directories.
+
+mysqldump -uroot -proot schemaname > $YEAR/$MONTH/$DAY/$HOUR/mysql.sql
+#mysqldump is a command to take backup and follwed by path to store the backup $YEAR/$MONTH/$DAY/$HOUR/mysql.sql
+#schemaname means for which data base we want to take back up that is we need to mention.
+
+mysqldump -uroot -proot schemaname > /home/schema.sql
+mysqldump -uroot -proot schemaname > /home/schema.sql
+mysqldump -uroot -proot schemaname > /home/schema.sql 
+mysqldump -uroot -proot schemaname > /home/schema.sql
+--------------------------------------------------------------
+
+
+
+YEAR=`date +%Y`
+MONTH=`date +%m`
+DAY=`date +%d`
+HOUR=`date+%H`
+sudo mkdir -p $YEAR/$MONTH/$DAY/$HOUR
+
+mysqldump -uroot -proot control > $YEAR/$MONTH/$DAY/$HOUR/control.sql --set-gtid-purged=OFF
+mysqldump -uroot -proot fundstransfer > $YEAR/$MONTH/$DAY/$HOUR/fundstransfer.sql --set-gtid-purged=OFF
+
+Note: if we run top command there we can see the process ids(PID) of different tasks those are running in background
+
+sudo kill -9 <PID>
+/* to kill the background tasks
+
+ps -ef
+/* to check the running processes(PIDs) 
+ps -ef | grep <keyword of any service>
+/* to search the keyword in running process
+
+
+
+**********************************************************************************************************
+
+Developers usually assign a port to their service while writing source code.
+
+JAVA SERVICES UP & DOWN
+
+
+1]  service 
+Port No: 8090  
+sudo ss -lptn 'sport = :8090' | tail -n1
+nohup java -jar target/service.jar & 
+#here & will do that service run even we exit out
+
+servivces.sh
+#to check the services
+ 
+sudo ss -lptn 'sport = :8090' | tail -n1
+#to check any kind of process running on port 8090
+#if the command o/p gives any PID then it is running if not if we get the peer port then the port assingned to a service but that was not running.
+#if this command gives no output then we can conclude that there is no service was assigned to the respective port
+ 
+sudo ss -lptn 'sport = :8091' | tail -n1
+sudo ss -lptn 'sport = :8092' | tail -n1
+sudo ss -lptn 'sport = :8093' | tail -n1
+sudo ss -lptn 'sport = :8094' | tail -n1
+
+sudo kill -9 pid
+
+start java services
+#2servicename-9090
+
+cd /home/sandeep/services/Reports
+
+nohup java -jar target/service.jar &
+#to up the jar file service using nohup command
+#go to the dierctory where src pom.xml were found before executing the above command
+
+***************************************************************
+
+/////////Scripts to check always make java services up:
+
+
+
+#!/bin/bash	
+
+timestamp=`date +"%Y-%m-%d %H:%M:%S"`
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" -I http://localhost:9092/getAlltemplateNames)
+#these two commands will every time hits the given URL with respective port number and checks the status if n/w status 200 means the service is up and runnig 
+
+
+if [[ ${STATUS} -eq 200 ]]
+then
+echo “ $timestamp Everything is Fine” >> /home/service/reporting_log.txt
+else
+cd /home/admin/services/Reports
+nohup java -jar target/service.jar &
+echo " $timestamp Restarted successfully" >> /home/service/reporting_log.txt
+echo " Services" |mutt -s "Buzz Reporting Restarted $timestamp " -- sandeep@acure.com 
+fi
+
+#here if the status is other than 200 as per script it will go to respective path where pom.xml, src and target directories found and execute the no hup command to up the service
+#here if we install mutt package and by giving the respective SMTP inputs then we will recieve the server status as an email.
+
+*********************************************************************************************************

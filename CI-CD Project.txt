@@ -1,0 +1,93 @@
+git hub 
+git creds
+mvn build 
+convert maven build output artifact into docker image
+docker images
+push image into docker hub
+from here we can deploy into UAT/Prod servers using docker swarm/ansible/jenkins as well
+
+
+
+
+Docker file: for creating an ubuntu image having tomact
+FROM ubuntu:18.04
+MAINTAINER Anand<jvanand.kothur@gmail.com>
+run apt-get update
+run apt-get install default-jdk -y
+run apt-get install wget -y
+run mkdir /opt/tomcat/
+WORKDIR /opt/tomcat
+ADD https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.53/bin/apache-tomcat-9.0.53-fulldocs.tar.gz /opt/tomcat
+run mv apache-tomcat-9.0.53/* /opt/tomcat/.
+WORKDIR /opt/tomcat/webapps
+copy target/*.war /usr/local/tomcat/webapps/
+EXPOSE 8080
+
+
+Docker file: for tomcat image
+FROM tomcat:8
+copy target/*.war /usr/local/tomcat/webapps/
+
+
+
+jenkins pipeline::
+
+node{
+    stage('cloning code from git hub'){
+        git credentialsId: 'Git_hubcreds', url: 'https://github.com/anand5666/ICICI_Accounts_2.git'
+    }
+	stage()
+}
+
+test pipe line:
+
+pipeline {
+    agent any
+    stages {
+        stage('Test') {
+            steps {
+               echo "hello" 
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+node{
+    stage('cloning code from git hub'){
+        git credentialsId: 'Git_hubcreds', url: 'https://github.com/devopsbyrushi/paytmwar.git'
+        echo"ffffffffffffff"
+    }
+     stage('building code with maven'){
+        sh 'mvn clean install'
+    }
+    stage('buiding code with update code with docker'){
+        sh 'docker build -t anand2021/mypipelinejob .'
+    }
+    
+     stage('pushing image in to docker hub'){
+         
+         withCredentials([string(credentialsId: 'anand2022', variable: 'hubpwd')]) {
+            sh 'docker login -u anand2021 -p $hubpwd'
+        
+        }
+        sh 'docker push anand2021/mypipelinejob'
+    
+    }
+         
+     
+    
+    
+    
+}
+
+
+
+#####with crediancials:Bind crediancials to variables(pwd)
+
+

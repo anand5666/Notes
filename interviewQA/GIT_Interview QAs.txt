@@ -1,0 +1,110 @@
+Interview Q&As:
+
+>WHAT IS GIT ?
+
+>WHATS IS DISTRIBUTED VERSION CONTROL SYSTEM(VCS) ?
+these systems dont rely on central server for storing the files
+
+>ADVANTAGES OF VCS
+provides flexibility
+all the versions are esaily available
+changes can be tracker easily
+provides backup 
+
+>DIFFERENCES B/W GIT AND SVN
+
+>WHAT LANGUAGE IS USED ING GIT 
+it uses 'c' language
+
+>MENTION GIT REPOSITORY HOSTING FUNCTIONS
+
+git hub, git lab, bit bucket, source forge, gitenterprise
+
+>WHAT IS REPOSITORY IN GIT
+its a place where git store all the files
+
+>BARE REPOSITORY IN GIT
+
+>GIT INIT 
+this command creates a local repository in git
+
+>HOW DO YOU FIX A BROKEN COOMAND IN GIT
+git commit --amend
+
+>WHAT IS CONFLICT ERROR AND HOW CAN YOU RESOLVE
+when two seperate branches have made edits to the same line in a file or when a file has been deleted in one branch.
+solution: will identify the file that causing the conflict using git status and made the necessary changes and will add the files and then will commit again 
+
+>HOW DO YOU REVERT A COMMIT THAT HAS ALREADY BEEN PUSHED AND MADE PUBLIC
+we can remove  the commited change from central repo and fix it push it again or 
+else we can create a new commit that undo all changes in the previous commit by using git revert <commit id>
+
+>DIFFERENCE B/W GIT PULL AND GIT FETCH
+git pull  ---> pulls all new changes from a perticular branch from central repo and updates the target branch in local 
+git fetch ---> pulls all new changes from desired branch stores it in a new branch in local, if we want to merge the new changes with the target branch you need to use git merge
+git pull = git fetch + git merge
+
+>GIT STASH
+git stash temporarily shelves (or stashes) changes you've made to your working copy so you can work on something else, 
+and then come back and re-apply them later on. 
+Stashing is handy if you need to quickly switch context and work on something else, but you're mid-way through a code change and aren't quite ready to commit.
+
+git stash pop ---> to bring back the files in stash memory
+
+> GIT STATUS AND GIT DIFF
+
+The git diff command displays the differences between files in two commits or between a commit and your current repository. 
+You can see what text has been added to, removed from, and changed in a file. 
+By default, the git diff command displays any uncommitted changes to your repository.
+
+>HOW DO YOU FIND THE LIST OF FILES THAT CHANGED DURING A COMMIT
+
+git diff-tree -r {hash}
+or
+git diff-tree --no-commit-id --name-only -r {hash}
+
+>function of git config 
+
+
+>WHAT IS GIT HEAD?
+
+The term HEAD refers to the current commit you are viewing. By default, you'll view the tip of the master branch on a repository, unless the main branch of your repository has a different name
+
+>WHAT IS .GITIGNORE FILE? WHAT IS THE PURPOSE OF THE FILE?
+
+When you’re working in your copy, Git watches every file in and considers it in three ways:
+
+
+Tracked: You’ve already staged or committed the file.
+Untracked: You’ve not staged or committed.
+Ignored: You’ve explicitly told Git to ignore the file(s).
+The .gitignore file tells Git which files to ignore when committing your project to the GitHub repository. gitignore is located in the root directory of your repo.
+
+WHY DO I NEED TO IGNORE FILES IN GIT?
+You may want to ignore certain files for multiple reasons:
+
+The files contain sensitive data.
+The files are system specific and do not need to exist on every machine’s copy.
+Excluding the files maintains system security rules and privileges. (Remember, Git repos only contain the files necessary to get tech support—not to share the entire software.)
+
+
+WHAT IS CHERRY-PICK IN GIT?
+
+Cherry picking is the act of picking a commit from one branch and applying it to another branch
+
+HOW TO CHECK DIFFERENCE IN BETWEEN TWO FILES?
+
+git diff <file1> <file2>
+
+HOW EDIT THE COMMITTED MESSAGE?
+
+git commit --amend
+
+HOW TO DELETE REMOTE BRANCH AND LOCAL BRANCH?
+
+git push origin -d <branchname>
+
+HOW TO CREATE LOCAL BRANCH?
+
+git branch <branch name>
+

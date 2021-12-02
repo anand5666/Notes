@@ -1,0 +1,77 @@
+Git is a free, open source distributed version control system tool designed to handle everything from small to very large projects with speed and efficiency. 
+It was created by Linus Torvalds in 2005 to develop Linux Kernel. 
+Git has the functionality, performance, security and flexibility that most teams and individual developers need. 
+It also serves as an important distributed version-control DevOps tool. 
+
+
+
+
+git remote add origin <url>
+
+/*url from https but not from ssh
+
+/*to add destination git hub origin
+
+git remote -v
+/* to check the destination git hub origin
+
+git remote remove origin
+/* to remove the destination git hub origin
+
+
+git push -u origin <Branch name>
+
+git push -f origin master
+
+git config --global user.email "jvanand.kothuri@gmail.com"
+
+git config --global user.name "anand5666"
+"
+
+***************push into git hub
+
+git init
+
+ls
+
+git status
+
+git add .
+
+git commit -m "creditcardbills"
+
+git log
+/*to check the logs in local area
+
+git push -u origin master
+
+to pull from master branch:
+
+git pull https://github.com/anand5666/HDFC_Netbanking.git master
+
+
+git pull origin master --allow-unrelated-histories -m "merging with local"
+/*to merge files in git hub with local
+
+git reset --hard origin/master
+/* to reset the master branch
+
+git reset --soft <commit id>
+/* to pull back commited chage from Local repository to staging area
+
+git reset head <file name>
+/* to pull back changes from staging area to working area
+
+git commit --mixed <commit id>
+/* to pull back commited chages directly from Local repository to working area
+
+
+
+
+
+
+personal access token:
+anand5666
+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
+
+
